@@ -33,6 +33,21 @@
             flex: 1;
             min-width: 400px;
         }
+        .controls {
+            margin-bottom: 15px;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        select {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -91,8 +106,18 @@
     <div class="container">
         <!-- LEFT PANEL: TABLE -->
         <div class="panel">
-            <h2>Data Input</h2>
-            <p>Enter depth in mm. Graph updates automatically.</p>
+            <h2 style="margin-top: 0;">Data Input</h2>
+            
+            <div class="controls">
+                <label for="intervalSelect"><strong>Set Time Interval:</strong></label>
+                <select id="intervalSelect" onchange="changeInterval()">
+                    <option value="3">3 minutes</option>
+                    <option value="5">5 minutes</option>
+                    <option value="10" selected>10 minutes</option>
+                </select>
+                <span style="font-size: 0.85em; color: #555;">(Auto-fills the time column)</span>
+            </div>
+
             <table id="dataTable">
                 <thead>
                     <tr>
@@ -112,7 +137,7 @@
 
         <!-- RIGHT PANEL: GRAPH & SLOPES -->
         <div class="panel">
-            <h2>Depth vs Time Graph</h2>
+            <h2 style="margin-top: 0;">Depth vs Time Graph</h2>
             <canvas id="soakageChart" height="200"></canvas>
             
             <div class="slope-box">
@@ -141,7 +166,7 @@
         for (let i = 0; i < NUM_ROWS; i++) {
             const tr = document.createElement('tr');
             
-            // Time column (increments of 10)
+            // Time column (default starts at 10 min interval)
             const tdTime = document.createElement('td');
             tdTime.innerHTML = `<input type="number" class="time-input" value="${i * 10}" oninput="updateData()">`;
             tr.appendChild(tdTime);
@@ -188,6 +213,20 @@
                 }
             }
         });
+
+        // Function triggered when dropdown is changed
+        function changeInterval() {
+            const interval = parseInt(document.getElementById('intervalSelect').value);
+            const timeInputs = document.querySelectorAll('.time-input');
+            
+            // Loop through time inputs and update them
+            timeInputs.forEach((input, index) => {
+                input.value = index * interval;
+            });
+            
+            // Automatically refresh the graph and slopes with the new times
+            updateData();
+        }
 
         // Calculate Slope using Linear Regression for highest accuracy
         function calculateSlope(xArr, yArr) {
