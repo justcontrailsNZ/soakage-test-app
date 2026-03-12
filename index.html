@@ -22,7 +22,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
         }
         .panel {
@@ -31,43 +31,34 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             flex: 1;
-            min-width: 400px;
-        }
-        .controls {
-            margin-bottom: 15px;
-            background-color: #e9ecef;
-            padding: 10px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        select {
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            font-size: 1em;
+            min-width: 450px;
+            overflow-x: auto;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
+            font-size: 0.95em;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px 4px;
             text-align: center;
         }
         th {
             background-color: #f8f9fa;
+        }
+        /* Create strong dividers between the 5 holes for readability */
+        .hole-divider {
+            border-right: 3px solid #b0bec5 !important;
         }
         tfoot {
             font-weight: bold;
             background-color: #e9ecef;
         }
         input {
-            width: 70px;
-            padding: 6px;
+            width: 50px;
+            padding: 5px;
             text-align: center;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -77,8 +68,15 @@
             border-color: #007bff;
         }
         .time-input {
-            background-color: #e9ecef;
+            background-color: #f0f4c3; /* slight color to differentiate time from depth */
+        }
+        select {
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #aaa;
             font-weight: bold;
+            margin-top: 5px;
+            cursor: pointer;
         }
         .btn-add {
             background-color: #28a745;
@@ -118,7 +116,6 @@
         .sr-row td {
             background-color: #e3f2fd;
             color: #0d47a1;
-            font-size: 0.95em;
         }
     </style>
 </head>
@@ -128,28 +125,49 @@
 
     <div class="container">
         <!-- LEFT PANEL: TABLE -->
-        <div class="panel">
-            <h2 style="margin-top: 0;">Data Input</h2>
-            
-            <div class="controls">
-                <label for="intervalSelect"><strong>Set Time Interval:</strong></label>
-                <select id="intervalSelect" onchange="changeInterval()">
-                    <option value="3">3 minutes</option>
-                    <option value="5">5 minutes</option>
-                    <option value="10" selected>10 minutes</option>
-                </select>
-                <span style="font-size: 0.85em; color: #555;">(Auto-fills the time column)</span>
-            </div>
+        <div class="panel" style="flex: 1.5;">
+            <h2 style="margin-top: 0; text-align: center;">Data Input</h2>
+            <p style="text-align: center; font-size: 0.9em; color: #555;">Each hole has its own Time (min) and Depth (mm) inputs.</p>
 
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th>Time (min)</th>
-                        <th>Hole 1 (mm)</th>
-                        <th>Hole 2 (mm)</th>
-                        <th>Hole 3 (mm)</th>
-                        <th>Hole 4 (mm)</th>
-                        <th>Hole 5 (mm)</th>
+                        <th rowspan="2" class="hole-divider" style="vertical-align: bottom;">Rd #</th>
+                        
+                        <!-- Headers for 5 Holes with Interval Selectors -->
+                        <th colspan="2" class="hole-divider" style="color:#FF6384;">Hole 1<br>
+                            <select id="interval0" onchange="changeInterval(0)">
+                                <option value="3">3 min</option><option value="5" selected>5 min</option>
+                            </select>
+                        </th>
+                        <th colspan="2" class="hole-divider" style="color:#36A2EB;">Hole 2<br>
+                            <select id="interval1" onchange="changeInterval(1)">
+                                <option value="3">3 min</option><option value="5" selected>5 min</option>
+                            </select>
+                        </th>
+                        <th colspan="2" class="hole-divider" style="color:#4BC0C0;">Hole 3<br>
+                            <select id="interval2" onchange="changeInterval(2)">
+                                <option value="3">3 min</option><option value="5" selected>5 min</option>
+                            </select>
+                        </th>
+                        <th colspan="2" class="hole-divider" style="color:#FF9F40;">Hole 4<br>
+                            <select id="interval3" onchange="changeInterval(3)">
+                                <option value="3">3 min</option><option value="5" selected>5 min</option>
+                            </select>
+                        </th>
+                        <th colspan="2" class="hole-divider" style="color:#9966FF;">Hole 5<br>
+                            <select id="interval4" onchange="changeInterval(4)">
+                                <option value="3">3 min</option><option value="5" selected>5 min</option>
+                            </select>
+                        </th>
+                    </tr>
+                    <tr>
+                        <!-- Sub-headers mapping to Time and Depth columns -->
+                        <th>Min</th><th class="hole-divider">mm</th>
+                        <th>Min</th><th class="hole-divider">mm</th>
+                        <th>Min</th><th class="hole-divider">mm</th>
+                        <th>Min</th><th class="hole-divider">mm</th>
+                        <th>Min</th><th class="hole-divider">mm</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -158,20 +176,20 @@
                 <!-- TFOOT FOR AVERAGE DROP AND SOAKAGE RATE -->
                 <tfoot>
                     <tr>
-                        <td style="font-size: 0.85em;">Avg Drop / Interval (mm):</td>
-                        <td id="avg0">-</td>
-                        <td id="avg1">-</td>
-                        <td id="avg2">-</td>
-                        <td id="avg3">-</td>
-                        <td id="avg4">-</td>
+                        <td class="hole-divider" style="font-size: 0.8em;">Avg Drop<br>(mm/Int):</td>
+                        <td colspan="2" class="hole-divider" id="avg0">-</td>
+                        <td colspan="2" class="hole-divider" id="avg1">-</td>
+                        <td colspan="2" class="hole-divider" id="avg2">-</td>
+                        <td colspan="2" class="hole-divider" id="avg3">-</td>
+                        <td colspan="2" class="hole-divider" id="avg4">-</td>
                     </tr>
                     <tr class="sr-row">
-                        <td>Soakage Rate, Sr (mm/hr):</td>
-                        <td id="sr0">-</td>
-                        <td id="sr1">-</td>
-                        <td id="sr2">-</td>
-                        <td id="sr3">-</td>
-                        <td id="sr4">-</td>
+                        <td class="hole-divider" style="font-size: 0.8em;">Soakage Rate<br>Sr (mm/hr):</td>
+                        <td colspan="2" class="hole-divider" id="sr0">-</td>
+                        <td colspan="2" class="hole-divider" id="sr1">-</td>
+                        <td colspan="2" class="hole-divider" id="sr2">-</td>
+                        <td colspan="2" class="hole-divider" id="sr3">-</td>
+                        <td colspan="2" class="hole-divider" id="sr4">-</td>
                     </tr>
                 </tfoot>
             </table>
@@ -182,13 +200,13 @@
         </div>
 
         <!-- RIGHT PANEL: GRAPH & SLOPES -->
-        <div class="panel">
+        <div class="panel" style="flex: 1;">
             <h2 style="margin-top: 0;">Depth vs Time Graph</h2>
-            <canvas id="soakageChart" height="200"></canvas>
+            <canvas id="soakageChart" height="250"></canvas>
             
             <div class="slope-box">
-                <h3 style="margin-top: 0;">Linear Regression Slope</h3>
-                <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #555;">Overall best-fit trend rate (mm/hr)</p>
+                <h3 style="margin-top: 0;">Linear Regression Rate</h3>
+                <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #555;">Overall best-fit trend (mm/hr)</p>
                 <div class="slope-grid">
                     <div class="slope-item">Hole 1 <span id="slope0" style="color: #FF6384;">N/A</span></div>
                     <div class="slope-item">Hole 2 <span id="slope1" style="color: #36A2EB;">N/A</span></div>
@@ -201,7 +219,7 @@
     </div>
 
     <script>
-        let rowCount = 10; // Starts with 10 rows
+        let rowCount = 10; // Starts with 10 readings
         const NUM_HOLES = 5;
         
         // Colors for the 5 holes
@@ -215,19 +233,28 @@
 
         // Function to create a row in the table
         function createRow(rowIndex) {
-            const interval = parseInt(document.getElementById('intervalSelect').value);
             const tr = document.createElement('tr');
             
-            // Time column
-            const tdTime = document.createElement('td');
-            tdTime.innerHTML = `<input type="number" class="time-input" value="${rowIndex * interval}" oninput="updateData()">`;
-            tr.appendChild(tdTime);
+            // Reading Number
+            const tdIndex = document.createElement('td');
+            tdIndex.className = 'hole-divider';
+            tdIndex.innerHTML = `<strong>${rowIndex}</strong>`;
+            tr.appendChild(tdIndex);
 
-            // 5 Hole columns
+            // 5 Hole groups (Time and Depth)
             for (let h = 0; h < NUM_HOLES; h++) {
-                const tdHole = document.createElement('td');
-                tdHole.innerHTML = `<input type="number" class="hole-input hole-${h}" placeholder="0" oninput="updateData()">`;
-                tr.appendChild(tdHole);
+                const interval = parseInt(document.getElementById(`interval${h}`).value);
+                
+                // Time Input
+                const tdTime = document.createElement('td');
+                tdTime.innerHTML = `<input type="number" class="time-input time-${h}" value="${rowIndex * interval}" oninput="updateData()">`;
+                tr.appendChild(tdTime);
+
+                // Depth Input
+                const tdDepth = document.createElement('td');
+                tdDepth.className = 'hole-divider';
+                tdDepth.innerHTML = `<input type="number" class="hole-input depth-${h}" placeholder="-" oninput="updateData()">`;
+                tr.appendChild(tdDepth);
             }
             tbody.appendChild(tr);
         }
@@ -236,7 +263,7 @@
         function addRow() {
             createRow(rowCount);
             rowCount++;
-            updateData(); // Refresh the graph and calculations to include the new empty row
+            updateData(); // Refresh the graph
         }
 
         // Initialize Chart.js
@@ -245,7 +272,7 @@
         for (let h = 0; h < NUM_HOLES; h++) {
             datasets.push({
                 label: `Hole ${h + 1}`,
-                data: Array(rowCount).fill(null),
+                data: [], // Starts empty, will be filled with {x, y} coordinates
                 borderColor: colors[h],
                 backgroundColor: colors[h],
                 fill: false,
@@ -255,15 +282,14 @@
 
         const chart = new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: Array.from({length: rowCount}, (_, i) => i * parseInt(document.getElementById('intervalSelect').value)),
-                datasets: datasets
-            },
+            data: { datasets: datasets },
             options: {
                 responsive: true,
                 scales: {
                     x: {
-                        title: { display: true, text: 'Time (minutes)', font: { weight: 'bold' } }
+                        type: 'linear', // Required so different holes can have different times!
+                        title: { display: true, text: 'Time (minutes)', font: { weight: 'bold' } },
+                        min: 0
                     },
                     y: {
                         title: { display: true, text: 'Depth (mm)', font: { weight: 'bold' } },
@@ -273,39 +299,31 @@
             }
         });
 
-        // Function triggered when dropdown is changed
-        function changeInterval() {
-            const interval = parseInt(document.getElementById('intervalSelect').value);
-            const timeInputs = document.querySelectorAll('.time-input');
+        // Function triggered when ANY interval dropdown is changed
+        function changeInterval(holeIndex) {
+            const interval = parseInt(document.getElementById(`interval${holeIndex}`).value);
+            const timeInputs = document.querySelectorAll(`.time-${holeIndex}`);
             
-            // Loop through time inputs and update them
+            // Re-calculate the time column for just that specific hole
             timeInputs.forEach((input, index) => {
                 input.value = index * interval;
             });
             
-            // Automatically refresh the graph and slopes with the new times
+            // Refresh the math and graph
             updateData();
         }
 
-        // Calculate Slope using Linear Regression for highest accuracy
-        function calculateSlope(xArr, yArr) {
-            let validX = [], validY = [];
-            for(let i=0; i<xArr.length; i++) {
-                if(!isNaN(yArr[i]) && yArr[i] !== null) {
-                    validX.push(xArr[i]);
-                    validY.push(yArr[i]);
-                }
-            }
-            
-            let n = validX.length;
-            if (n < 2) return null; // Need at least 2 points to make a line
+        // Calculate Slope using Linear Regression from coordinate pairs
+        function calculateSlope(pairs) {
+            let n = pairs.length;
+            if (n < 2) return null; 
 
             let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
             for (let i = 0; i < n; i++) {
-                sumX += validX[i];
-                sumY += validY[i];
-                sumXY += validX[i] * validY[i];
-                sumXX += validX[i] * validX[i];
+                sumX += pairs[i].x;
+                sumY += pairs[i].y;
+                sumXY += pairs[i].x * pairs[i].y;
+                sumXX += pairs[i].x * pairs[i].x;
             }
             let slope = ((n * sumXY) - (sumX * sumY)) / ((n * sumXX) - (sumX * sumX));
             return slope; // This returns mm per minute
@@ -313,60 +331,58 @@
 
         // Function triggered every time a user types in a box
         function updateData() {
-            // Get all time values
-            const interval = parseInt(document.getElementById('intervalSelect').value);
-            const timeInputs = document.querySelectorAll('.time-input');
-            const times = Array.from(timeInputs).map(inp => parseFloat(inp.value));
-            
-            // Calculate X (Number of intervals in an hour)
-            const X_multiplier = 60 / interval;
-
-            // Update X-axis labels on graph
-            chart.data.labels = times;
-
-            // Process each hole
+            // Process each hole independently
             for (let h = 0; h < NUM_HOLES; h++) {
-                const holeInputs = document.querySelectorAll(`.hole-${h}`);
-                const holeData = Array.from(holeInputs).map(inp => inp.value === "" ? null : parseFloat(inp.value));
-                
-                // 1. Update graph line
-                chart.data.datasets[h].data = holeData;
+                const interval = parseInt(document.getElementById(`interval${h}`).value);
+                const X_multiplier = 60 / interval; // Calculates how many intervals are in an hour
 
-                // 2. Calculate and display AVERAGE DROP PER INTERVAL & SOAKAGE RATE
+                const timeInputs = document.querySelectorAll(`.time-${h}`);
+                const depthInputs = document.querySelectorAll(`.depth-${h}`);
+                
+                let validPairs = [];
                 let totalNormalizedDrop = 0;
                 let dropCount = 0;
                 let prevTime = null;
                 let prevDepth = null;
 
-                for(let i = 0; i < times.length; i++) {
-                    if(holeData[i] !== null && !isNaN(holeData[i])) {
-                        if(prevDepth !== null) {
-                            // Calculate absolute difference in depth
-                            let deltaD = Math.abs(holeData[i] - prevDepth);
-                            let deltaT = times[i] - prevTime;
+                // Loop through all rows for this specific hole
+                for (let i = 0; i < timeInputs.length; i++) {
+                    let t = parseFloat(timeInputs[i].value);
+                    let d = parseFloat(depthInputs[i].value);
+
+                    // Check if both Time and Depth boxes have numbers in them
+                    if (!isNaN(t) && !isNaN(d)) {
+                        validPairs.push({x: t, y: d}); // Add coordinate to graph
+
+                        // Calculate drop from previous reading
+                        if (prevDepth !== null && prevTime !== null) {
+                            let deltaD = Math.abs(d - prevDepth);
+                            let deltaT = t - prevTime;
                             
-                            if(deltaT > 0) {
-                                // Find out how many intervals passed (in case a row is left blank)
+                            if (deltaT > 0) {
+                                // Find out how many intervals passed
                                 let intervalsPassed = deltaT / interval;
                                 let normalizedDrop = deltaD / intervalsPassed;
                                 totalNormalizedDrop += normalizedDrop;
                                 dropCount++;
                             }
                         }
-                        prevTime = times[i];
-                        prevDepth = holeData[i];
+                        prevTime = t;
+                        prevDepth = d;
                     }
                 }
+                
+                // 1. Update graph line with coordinates
+                chart.data.datasets[h].data = validPairs;
 
+                // 2. Calculate and display AVERAGE DROP & SOAKAGE RATE (Sr)
                 const avgDisplay = document.getElementById(`avg${h}`);
                 const srDisplay = document.getElementById(`sr${h}`);
                 
                 if (dropCount > 0) {
-                    // Avg Drop
                     const avgDrop = totalNormalizedDrop / dropCount;
                     avgDisplay.innerText = avgDrop.toFixed(2);
                     
-                    // Soakage Rate (Sr)
                     const soakageRate = avgDrop * X_multiplier;
                     srDisplay.innerText = soakageRate.toFixed(2);
                 } else {
@@ -374,23 +390,27 @@
                     srDisplay.innerText = "-";
                 }
 
-                // 3. Calculate and display LINEAR REGRESSION SLOPE (Converted to mm/hr)
-                const slope_per_min = calculateSlope(times, holeData);
+                // 3. Calculate and display LINEAR REGRESSION SLOPE
+                const slope_per_min = calculateSlope(validPairs);
                 const slopeDisplay = document.getElementById(`slope${h}`);
+                
                 if (slope_per_min !== null) {
-                    const slope_per_hr = slope_per_min * 60; // Multiply by 60 to get per hour
-                    
-                    // Convert negative slope to a positive drop rate
-                    const absolute_slope = Math.abs(slope_per_hr);
+                    const slope_per_hr = slope_per_min * 60; // per hour
+                    const absolute_slope = Math.abs(slope_per_hr); // Make it a positive drop rate
                     slopeDisplay.innerText = absolute_slope.toFixed(2) + " mm/hr";
                 } else {
                     slopeDisplay.innerText = "N/A";
                 }
             }
             
-            // Redraw graph
+            // Redraw graph completely
             chart.update();
         }
+
+        // Run once on load to establish baseline
+        window.onload = function() {
+            updateData();
+        };
     </script>
 </body>
 </html>
