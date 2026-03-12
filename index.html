@@ -213,7 +213,8 @@
         <!-- RIGHT PANEL: GRAPH & SLOPES -->
         <div class="panel" style="flex: 1;">
             <h2 style="margin-top: 0; text-align: center;">Depth vs Time Graph</h2>
-            <canvas id="soakageChart" height="250"></canvas>
+            <!-- Made the canvas significantly taller so drops look steeper -->
+            <canvas id="soakageChart" height="350"></canvas>
             
             <div class="slope-box">
                 <h3 style="margin-top: 0;">Linear Regression Rate</h3>
@@ -292,14 +293,14 @@
         for (let h = 0; h < NUM_HOLES; h++) {
             datasets.push({
                 label: holeDataInfo[h].label,
-                data: [], // Starts empty, will be filled with {x, y} coordinates
+                data: [], 
                 borderColor: holeDataInfo[h].color,
                 backgroundColor: holeDataInfo[h].color,
-                borderWidth: 2.5, // Slightly thicker line
-                pointRadius: 4, // Bigger dots
-                pointHoverRadius: 7, // Even bigger when hovering
+                borderWidth: 2.5, 
+                pointRadius: 4, 
+                pointHoverRadius: 7, 
                 fill: false,
-                tension: 0 // keeps lines straight point-to-point
+                tension: 0 
             });
         }
 
@@ -308,6 +309,7 @@
             data: { datasets: datasets },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // Allows the taller height to work
                 interaction: {
                     mode: 'index',
                     intersect: false,
@@ -316,7 +318,7 @@
                     legend: {
                         position: 'top',
                         labels: {
-                            usePointStyle: true, // Uses circles instead of boxes in the legend
+                            usePointStyle: true, 
                             padding: 20,
                             font: { size: 13, family: 'system-ui' }
                         }
@@ -334,14 +336,15 @@
                 },
                 scales: {
                     x: {
-                        type: 'linear', // Required so different holes can have different times
+                        type: 'linear', 
                         title: { display: true, text: 'Time (minutes)', font: { weight: 'bold', size: 14 } },
                         min: 0,
                         grid: { color: '#eceff1' }
                     },
                     y: {
                         title: { display: true, text: 'Depth (mm)', font: { weight: 'bold', size: 14 } },
-                        beginAtZero: true,
+                        beginAtZero: false, // <-- REMOVED "START AT 0" SO IT ZOOMS IN
+                        grace: '10%',       // <-- ADDS A GAP AT THE TOP & BOTTOM SO LINES DON'T HIT EDGES
                         grid: { color: '#eceff1' }
                     }
                 }
@@ -375,7 +378,7 @@
                 sumXX += pairs[i].x * pairs[i].x;
             }
             let slope = ((n * sumXY) - (sumX * sumY)) / ((n * sumXX) - (sumX * sumX));
-            return slope; // This returns mm per minute
+            return slope; 
         }
 
         // Function triggered every time a user types in a box
@@ -383,7 +386,7 @@
             // Process each hole independently
             for (let h = 0; h < NUM_HOLES; h++) {
                 const interval = parseInt(document.getElementById(`interval${h}`).value);
-                const X_multiplier = 60 / interval; // Calculates how many intervals are in an hour
+                const X_multiplier = 60 / interval; 
 
                 const timeInputs = document.querySelectorAll(`.time-${h}`);
                 const depthInputs = document.querySelectorAll(`.depth-${h}`);
