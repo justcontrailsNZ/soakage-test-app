@@ -118,7 +118,6 @@
         }
         .sr-row td {
             background-color: #e3f2fd;
-            color: #0d47a1;
         }
         .info-box {
             margin-top: auto; /* Pushes to the bottom of the panel */
@@ -129,6 +128,15 @@
             font-size: 0.85em;
             color: #444;
         }
+        /* Graph Styling */
+        canvas {
+            background-color: #fcfdfe;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -138,8 +146,7 @@
     <div class="container">
         <!-- LEFT PANEL: TABLE -->
         <div class="panel" style="flex: 1.5;">
-            <h2 style="margin-top: 0; text-align: center;">Data Input</h2>
-            <p style="text-align: center; font-size: 0.9em; color: #555; margin-bottom: 20px;">Each hole has its own Time (min) and Depth (mm) inputs.</p>
+            <h2 style="margin-top: 0; text-align: center; margin-bottom: 20px;">Data Input</h2>
 
             <table id="dataTable">
                 <thead>
@@ -176,16 +183,17 @@
                 <!-- TFOOT FOR AVERAGE DROP AND SOAKAGE RATE -->
                 <tfoot>
                     <tr>
-                        <td class="hole-divider" style="font-size: 0.8em;">Avg Drop<br>(mm/Int):</td>
+                        <td class="hole-divider" style="font-size: 0.8em; color: #555;">Avg Drop<br>(mm/Int):</td>
                         <td colspan="2" class="hole-divider" id="avg0">-</td>
                         <td colspan="2" class="hole-divider" id="avg1">-</td>
                         <td colspan="2" class="hole-divider" id="avg2">-</td>
                     </tr>
                     <tr class="sr-row">
-                        <td class="hole-divider" style="font-size: 0.8em;">Soakage Rate<br>Sr (mm/hr):</td>
-                        <td colspan="2" class="hole-divider" id="sr0">-</td>
-                        <td colspan="2" class="hole-divider" id="sr1">-</td>
-                        <td colspan="2" class="hole-divider" id="sr2">-</td>
+                        <td class="hole-divider" style="font-size: 0.8em; color: #555;">Soakage Rate<br>Sr (mm/hr):</td>
+                        <!-- Colored specifically to match holes -->
+                        <td colspan="2" class="hole-divider" id="sr0" style="color:#FF6384; font-size: 1.15em; font-weight: 900;">-</td>
+                        <td colspan="2" class="hole-divider" id="sr1" style="color:#36A2EB; font-size: 1.15em; font-weight: 900;">-</td>
+                        <td colspan="2" class="hole-divider" id="sr2" style="color:#4BC0C0; font-size: 1.15em; font-weight: 900;">-</td>
                     </tr>
                 </tfoot>
             </table>
@@ -204,7 +212,7 @@
 
         <!-- RIGHT PANEL: GRAPH & SLOPES -->
         <div class="panel" style="flex: 1;">
-            <h2 style="margin-top: 0;">Depth vs Time Graph</h2>
+            <h2 style="margin-top: 0; text-align: center;">Depth vs Time Graph</h2>
             <canvas id="soakageChart" height="250"></canvas>
             
             <div class="slope-box">
@@ -287,6 +295,9 @@
                 data: [], // Starts empty, will be filled with {x, y} coordinates
                 borderColor: holeDataInfo[h].color,
                 backgroundColor: holeDataInfo[h].color,
+                borderWidth: 2.5, // Slightly thicker line
+                pointRadius: 4, // Bigger dots
+                pointHoverRadius: 7, // Even bigger when hovering
                 fill: false,
                 tension: 0 // keeps lines straight point-to-point
             });
@@ -297,15 +308,41 @@
             data: { datasets: datasets },
             options: {
                 responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true, // Uses circles instead of boxes in the legend
+                            padding: 20,
+                            font: { size: 13, family: 'system-ui' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#333',
+                        bodyColor: '#555',
+                        borderColor: '#ddd',
+                        borderWidth: 1,
+                        padding: 12,
+                        usePointStyle: true,
+                        boxPadding: 6
+                    }
+                },
                 scales: {
                     x: {
-                        type: 'linear', // Required so different holes can have different times!
-                        title: { display: true, text: 'Time (minutes)', font: { weight: 'bold' } },
-                        min: 0
+                        type: 'linear', // Required so different holes can have different times
+                        title: { display: true, text: 'Time (minutes)', font: { weight: 'bold', size: 14 } },
+                        min: 0,
+                        grid: { color: '#eceff1' }
                     },
                     y: {
-                        title: { display: true, text: 'Depth (mm)', font: { weight: 'bold' } },
-                        beginAtZero: true
+                        title: { display: true, text: 'Depth (mm)', font: { weight: 'bold', size: 14 } },
+                        beginAtZero: true,
+                        grid: { color: '#eceff1' }
                     }
                 }
             }
