@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soakage Test Experiment</title>
+    <title>Soakage Test</title>
     <!-- Import Chart.js for the graphing -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -129,19 +129,23 @@
             color: #444;
         }
         /* Graph Styling */
-        canvas {
+        .chart-container {
+            position: relative;
+            height: 350px; /* STRICTLY LOCKS THE HEIGHT SO IT NEVER EXPANDS */
+            width: 100%;
             background-color: #fcfdfe;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             padding: 10px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
             margin-bottom: 10px;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 
-    <h1>Soakage Test Tracker</h1>
+    <h1>Soakage Test</h1>
 
     <div class="container">
         <!-- LEFT PANEL: TABLE -->
@@ -213,8 +217,11 @@
         <!-- RIGHT PANEL: GRAPH & SLOPES -->
         <div class="panel" style="flex: 1;">
             <h2 style="margin-top: 0; text-align: center;">Depth vs Time Graph</h2>
-            <!-- Made the canvas significantly taller so drops look steeper -->
-            <canvas id="soakageChart" height="350"></canvas>
+            
+            <!-- Safe container to prevent graph expansion bug -->
+            <div class="chart-container">
+                <canvas id="soakageChart"></canvas>
+            </div>
             
             <div class="slope-box">
                 <h3 style="margin-top: 0;">Linear Regression Rate</h3>
@@ -309,7 +316,7 @@
             data: { datasets: datasets },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Allows the taller height to work
+                maintainAspectRatio: false, // Relies on the locked .chart-container height
                 interaction: {
                     mode: 'index',
                     intersect: false,
@@ -343,8 +350,7 @@
                     },
                     y: {
                         title: { display: true, text: 'Depth (mm)', font: { weight: 'bold', size: 14 } },
-                        beginAtZero: false, // <-- REMOVED "START AT 0" SO IT ZOOMS IN
-                        grace: '10%',       // <-- ADDS A GAP AT THE TOP & BOTTOM SO LINES DON'T HIT EDGES
+                        beginAtZero: false, // Ensures it "zooms in" to your deep measurements
                         grid: { color: '#eceff1' }
                     }
                 }
