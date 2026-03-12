@@ -22,7 +22,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            max-width: 1500px;
+            max-width: 1200px; /* Tightened the layout since there are fewer columns */
             margin: 0 auto;
         }
         .panel {
@@ -48,7 +48,7 @@
         th {
             background-color: #f8f9fa;
         }
-        /* Create strong dividers between the 5 holes for readability */
+        /* Create strong dividers between the 3 holes for readability */
         .hole-divider {
             border-right: 3px solid #b0bec5 !important;
         }
@@ -101,7 +101,7 @@
         }
         .slope-grid {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             margin-top: 10px;
         }
         .slope-item {
@@ -134,7 +134,7 @@
                     <tr>
                         <th rowspan="2" class="hole-divider" style="vertical-align: bottom;">Rd #</th>
                         
-                        <!-- Headers for 5 Holes with Interval Selectors -->
+                        <!-- Headers for 3 Holes with Interval Selectors -->
                         <th colspan="2" class="hole-divider" style="color:#FF6384;">Hole 1<br>
                             <select id="interval0" onchange="changeInterval(0)">
                                 <option value="3">3 min</option><option value="5" selected>5 min</option>
@@ -150,21 +150,9 @@
                                 <option value="3">3 min</option><option value="5" selected>5 min</option>
                             </select>
                         </th>
-                        <th colspan="2" class="hole-divider" style="color:#FF9F40;">Hole 4<br>
-                            <select id="interval3" onchange="changeInterval(3)">
-                                <option value="3">3 min</option><option value="5" selected>5 min</option>
-                            </select>
-                        </th>
-                        <th colspan="2" class="hole-divider" style="color:#9966FF;">Hole 5<br>
-                            <select id="interval4" onchange="changeInterval(4)">
-                                <option value="3">3 min</option><option value="5" selected>5 min</option>
-                            </select>
-                        </th>
                     </tr>
                     <tr>
                         <!-- Sub-headers mapping to Time and Depth columns -->
-                        <th>Min</th><th class="hole-divider">mm</th>
-                        <th>Min</th><th class="hole-divider">mm</th>
                         <th>Min</th><th class="hole-divider">mm</th>
                         <th>Min</th><th class="hole-divider">mm</th>
                         <th>Min</th><th class="hole-divider">mm</th>
@@ -180,16 +168,12 @@
                         <td colspan="2" class="hole-divider" id="avg0">-</td>
                         <td colspan="2" class="hole-divider" id="avg1">-</td>
                         <td colspan="2" class="hole-divider" id="avg2">-</td>
-                        <td colspan="2" class="hole-divider" id="avg3">-</td>
-                        <td colspan="2" class="hole-divider" id="avg4">-</td>
                     </tr>
                     <tr class="sr-row">
                         <td class="hole-divider" style="font-size: 0.8em;">Soakage Rate<br>Sr (mm/hr):</td>
                         <td colspan="2" class="hole-divider" id="sr0">-</td>
                         <td colspan="2" class="hole-divider" id="sr1">-</td>
                         <td colspan="2" class="hole-divider" id="sr2">-</td>
-                        <td colspan="2" class="hole-divider" id="sr3">-</td>
-                        <td colspan="2" class="hole-divider" id="sr4">-</td>
                     </tr>
                 </tfoot>
             </table>
@@ -211,8 +195,6 @@
                     <div class="slope-item">Hole 1 <span id="slope0" style="color: #FF6384;">N/A</span></div>
                     <div class="slope-item">Hole 2 <span id="slope1" style="color: #36A2EB;">N/A</span></div>
                     <div class="slope-item">Hole 3 <span id="slope2" style="color: #4BC0C0;">N/A</span></div>
-                    <div class="slope-item">Hole 4 <span id="slope3" style="color: #FF9F40;">N/A</span></div>
-                    <div class="slope-item">Hole 5 <span id="slope4" style="color: #9966FF;">N/A</span></div>
                 </div>
             </div>
         </div>
@@ -220,10 +202,10 @@
 
     <script>
         let rowCount = 10; // Starts with 10 readings
-        const NUM_HOLES = 5;
+        const NUM_HOLES = 3; // Changed from 5 to 3
         
-        // Colors for the 5 holes
-        const colors = ['#FF6384', '#36A2EB', '#4BC0C0', '#FF9F40', '#9966FF'];
+        // Colors for the 3 holes
+        const colors = ['#FF6384', '#36A2EB', '#4BC0C0'];
 
         // Initialize Table
         const tbody = document.getElementById('tableBody');
@@ -241,7 +223,7 @@
             tdIndex.innerHTML = `<strong>${rowIndex}</strong>`;
             tr.appendChild(tdIndex);
 
-            // 5 Hole groups (Time and Depth)
+            // 3 Hole groups (Time and Depth)
             for (let h = 0; h < NUM_HOLES; h++) {
                 const interval = parseInt(document.getElementById(`interval${h}`).value);
                 
