@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soakage Test</title>
+    <title>Soakage Test by JTLobarbio</title>
     <!-- Import Chart.js for the graphing -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -131,7 +131,7 @@
         /* Graph Styling */
         .chart-container {
             position: relative;
-            height: 350px; /* STRICTLY LOCKS THE HEIGHT SO IT NEVER EXPANDS */
+            height: 350px; 
             width: 100%;
             background-color: #fcfdfe;
             border: 1px solid #e0e0e0;
@@ -140,6 +140,23 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
             margin-bottom: 10px;
             box-sizing: border-box;
+        }
+        /* Editable Header Styling */
+        .editable-header {
+            background: transparent;
+            border: 1px dashed transparent;
+            font-weight: bold;
+            font-size: 1.05em;
+            font-family: inherit;
+            text-align: center;
+            width: 130px;
+            padding: 2px;
+            margin-bottom: 4px;
+            cursor: text;
+        }
+        .editable-header:focus {
+            border-bottom: 1px dashed #555;
+            outline: none;
         }
     </style>
 </head>
@@ -157,18 +174,21 @@
                     <tr>
                         <th rowspan="2" class="hole-divider" style="vertical-align: bottom;">Rd #</th>
                         
-                        <!-- Headers for 3 Holes with Interval Selectors -->
-                        <th colspan="2" class="hole-divider" style="color:#FF6384;">Hole 1 (790mm)<br>
+                        <!-- Headers for 3 Holes with Editable Names and Selectors -->
+                        <th colspan="2" class="hole-divider" style="color:#FF6384;">
+                            <input type="text" id="holeName0" class="editable-header" style="color:#FF6384;" value="Hole 1 (790mm)" oninput="updateHoleNames()"><br>
                             <select id="interval0" onchange="changeInterval(0)">
                                 <option value="3">3 min</option><option value="5" selected>5 min</option>
                             </select>
                         </th>
-                        <th colspan="2" class="hole-divider" style="color:#36A2EB;">Hole 2 (605mm)<br>
+                        <th colspan="2" class="hole-divider" style="color:#36A2EB;">
+                            <input type="text" id="holeName1" class="editable-header" style="color:#36A2EB;" value="Hole 2 (605mm)" oninput="updateHoleNames()"><br>
                             <select id="interval1" onchange="changeInterval(1)">
                                 <option value="3">3 min</option><option value="5" selected>5 min</option>
                             </select>
                         </th>
-                        <th colspan="2" class="hole-divider" style="color:#4BC0C0;">Hole 3 (1070mm)<br>
+                        <th colspan="2" class="hole-divider" style="color:#4BC0C0;">
+                            <input type="text" id="holeName2" class="editable-header" style="color:#4BC0C0;" value="Hole 3 (1070mm)" oninput="updateHoleNames()"><br>
                             <select id="interval2" onchange="changeInterval(2)">
                                 <option value="3">3 min</option><option value="5" selected>5 min</option>
                             </select>
@@ -218,7 +238,6 @@
         <div class="panel" style="flex: 1;">
             <h2 style="margin-top: 0; text-align: center;">Depth vs Time Graph</h2>
             
-            <!-- Safe container to prevent graph expansion bug -->
             <div class="chart-container">
                 <canvas id="soakageChart"></canvas>
             </div>
@@ -227,9 +246,9 @@
                 <h3 style="margin-top: 0;">Linear Regression Rate</h3>
                 <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #555;">Overall best-fit trend line</p>
                 <div class="slope-grid">
-                    <div class="slope-item">Hole 1 (790mm) <span id="slope0" style="color: #FF6384;">N/A</span></div>
-                    <div class="slope-item">Hole 2 (605mm) <span id="slope1" style="color: #36A2EB;">N/A</span></div>
-                    <div class="slope-item">Hole 3 (1070mm) <span id="slope2" style="color: #4BC0C0;">N/A</span></div>
+                    <div class="slope-item"><span id="slopeLabel0">Hole 1 (790mm)</span> <span id="slope0" style="color: #FF6384;">N/A</span></div>
+                    <div class="slope-item"><span id="slopeLabel1">Hole 2 (605mm)</span> <span id="slope1" style="color: #36A2EB;">N/A</span></div>
+                    <div class="slope-item"><span id="slopeLabel2">Hole 3 (1070mm)</span> <span id="slope2" style="color: #4BC0C0;">N/A</span></div>
                 </div>
             </div>
 
@@ -246,11 +265,11 @@
         let rowCount = 10; // Starts with 10 readings
         const NUM_HOLES = 3; 
         
-        // Setup metadata for the 3 holes
+        // Setup initial metadata for the 3 holes
         const holeDataInfo = [
-            { label: 'Hole 1 (790mm)', color: '#FF6384' },
-            { label: 'Hole 2 (605mm)', color: '#36A2EB' },
-            { label: 'Hole 3 (1070mm)', color: '#4BC0C0' }
+            { defaultLabel: 'Hole 1 (790mm)', color: '#FF6384' },
+            { defaultLabel: 'Hole 2 (605mm)', color: '#36A2EB' },
+            { defaultLabel: 'Hole 3 (1070mm)', color: '#4BC0C0' }
         ];
 
         // Initialize Table
@@ -299,7 +318,7 @@
         const datasets = [];
         for (let h = 0; h < NUM_HOLES; h++) {
             datasets.push({
-                label: holeDataInfo[h].label,
+                label: holeDataInfo[h].defaultLabel,
                 data: [], 
                 borderColor: holeDataInfo[h].color,
                 backgroundColor: holeDataInfo[h].color,
@@ -316,7 +335,7 @@
             data: { datasets: datasets },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Relies on the locked .chart-container height
+                maintainAspectRatio: false, 
                 interaction: {
                     mode: 'index',
                     intersect: false,
@@ -326,6 +345,8 @@
                         position: 'top',
                         labels: {
                             usePointStyle: true, 
+                            boxWidth: 8,  // <-- Makes the legend circle smaller
+                            boxHeight: 8, // <-- Makes the legend circle smaller
                             padding: 20,
                             font: { size: 13, family: 'system-ui' }
                         }
@@ -350,12 +371,26 @@
                     },
                     y: {
                         title: { display: true, text: 'Depth (mm)', font: { weight: 'bold', size: 14 } },
-                        beginAtZero: false, // Ensures it "zooms in" to your deep measurements
+                        beginAtZero: false, 
                         grid: { color: '#eceff1' }
                     }
                 }
             }
         });
+
+        // Function to update the custom Hole names everywhere
+        function updateHoleNames() {
+            for (let h = 0; h < NUM_HOLES; h++) {
+                const newName = document.getElementById(`holeName${h}`).value || `Hole ${h + 1}`;
+                
+                // Update Graph Legend
+                chart.data.datasets[h].label = newName;
+                
+                // Update Regression Rates Panel Text
+                document.getElementById(`slopeLabel${h}`).innerText = newName;
+            }
+            chart.update(); // Push changes to the chart
+        }
 
         // Function triggered when ANY interval dropdown is changed
         function changeInterval(holeIndex) {
@@ -468,6 +503,7 @@
         // Run once on load to establish baseline
         window.onload = function() {
             updateData();
+            updateHoleNames(); // Ensure labels match the text boxes immediately
         };
     </script>
 </body>
